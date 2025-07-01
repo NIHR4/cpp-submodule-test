@@ -1,0 +1,63 @@
+name: "Build project"
+on: 
+  push:
+    branches:
+      - master
+
+    
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+
+      # Install latest CMake and Ninja.
+      - uses: lukka/get-cmake@latest
+
+      # Setup vcpkg: ensures vcpkg is downloaded and built.
+      # Since vcpkg.json is being used later on to install the packages
+      # when `run-cmake` runs, no packages are installed at this time
+      # (and vcpkg does not run).
+      - name: Setup anew (or from cache) vcpkg (and does not build any package)
+        uses: lukka/run-vcpkg@v11 # Always specify the specific _version_ of the
+                                  # action you need, `v11` in this case to stay up
+                                  # to date with fixes on the v11 branch.
+
+      - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
+        uses: lukka/run-cmake@v10
+        with:
+
+          configurePreset: 'vs-vcpkg'
+          # Additional arguments can be appended to the cmake command.
+          # This is useful to reduce the number of CMake's Presets since you can reuse
+          # an existing preset with different variables.
+          #configurePresetAdditionalArgs: "['-DENABLE_YOUR_FEATURE=1']"
+
+          # This is the name of the CMakePresets.json's configuration to build the project.
+          buildPreset: 'vs-vcpkg-release'
+          # Additional arguments can be appended when building, for example to specify the
+          # configuration to build.
+          # This is useful to reduce the number of CMake's Presets you need in CMakePresets.json.
+          #buildPresetAdditionalArgs: "['--config Release']"
+
+          # This is the name of the CMakePresets.json's configuration to test the project with.
+          #testPreset: 'ninja-multi-vcpkg'
+          # Additional arguments can be appended when testing, for example to specify the config
+          # to test.
+          # This is useful to reduce the number of CMake's Presets you need in CMakePresets.json.
+          #testPresetAdditionalArgs: "['--config Release']"
+
+    env:
+    #  [OPTIONAL] Define the vcpkg's triplet you want to enforce, otherwise the default one
+    #  for the hosting system will be automatically choosen (x64 is the default on all
+    #  platforms, e.g. `x64-osx`).
+    #  VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+       VCPKG_DEFAULT_TRIPLET: "x86-windows"
+    #
+    #  [OPTIONAL] If VCPKG_DEFAULT_TRIPLET is defined then it may also be desirable to set the host
+    #  triplet to avoid unintended cross compiling behavior.
+    #  VCPKG_DEFAULT_HOST_TRIPLET: ${{ matrix.triplet }}
+    #
+    #  [OPTIONAL] By default the action disables vcpkg's telemetry by defining VCPKG_DISABLE_METRICS.
+    #  This behavior can be disabled by defining `VCPKG_ENABLE_METRICS` as follows.
+    #  VCPKG_ENABLE_METRICS: 1
+    #
