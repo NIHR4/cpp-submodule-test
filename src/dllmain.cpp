@@ -1,10 +1,10 @@
 #include <Windows.h>
-
-
+#include <fmt/format.h>
+#include <thread>
 extern "C" __declspec(dllexport) void Hello();
 
 void Hello() {
-    MessageBoxA(NULL, "Hello from the other side", "From C++ to the world", MB_OK);
+    MessageBoxA(NULL, fmt::format("Hello from the other side. Thread {}", GetCurrentThreadId()).c_str(), "From C++ to the world", MB_OK);
 }
 
 

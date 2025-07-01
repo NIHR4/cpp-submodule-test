@@ -4,11 +4,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(HelloClarionCpp VERSION 1.0 DESCRIPTION "project description" LANGUAGES CXX)
 
+# Find packages
+find_package(fmt CONFIG REQUIRED)
+
 # Find CPP files in src/
 file(GLOB_RECURSE SRC_FILES "src/*.cpp")
 
 #Create library
 add_library(HelloClarionCpp SHARED ${SRC_FILES})
+
+# Link libraries
+target_link_libraries(HelloClarionCpp PRIVATE fmt::fmt)
 
 #===========================================
 # Post-Build Task to convert to Clarion LIB
