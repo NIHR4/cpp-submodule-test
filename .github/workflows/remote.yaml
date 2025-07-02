@@ -4,6 +4,13 @@ on:
     secrets: 
       PAT:
         required: true
+    inputs:
+      repo:
+        required: true
+        type: string
+      ref:
+        required: true
+        type: string
     outputs:
       artifact-name:
         value: cpp-artifact
@@ -17,6 +24,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
+          repository: ${{ inputs.repo }}
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.PAT }}
           submodules: recursive
     
       # Install latest CMake and Ninja.
