@@ -1,8 +1,13 @@
 name: "Build project triggered from Clarion"
 on: 
-  repository_dispatch:
-    types: [build_event]
-
+  workflow_call:
+    secrets: 
+      PAT:
+        required: true
+    outputs:
+      artifact-name:
+        value: cpp-artifact
+        description: "Build artifact"
 jobs:
   build:
     runs-on: windows-latest
@@ -16,6 +21,13 @@ jobs:
     
       # Install latest CMake and Ninja.
       - uses: lukka/get-cmake@latest
+
+      # Cache and restore VCPKG (Workaround while)
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-${{ matrix.triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg_overlay/**', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
 
       # Setup vcpkg: ensures vcpkg is downloaded and built.
       # Since vcpkg.json is being used later on to install the packages
@@ -59,6 +71,7 @@ jobs:
             build/Release/*.lib
     
     env:
+       VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
     #  [OPTIONAL] Define the vcpkg's triplet you want to enforce, otherwise the default one
     #  for the hosting system will be automatically choosen (x64 is the default on all
     #  platforms, e.g. `x64-osx`).
