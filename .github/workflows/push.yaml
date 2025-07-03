@@ -10,7 +10,7 @@ on:
     
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: windows-latest
     steps:
 
       # Checkout the repository
@@ -20,11 +20,13 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Setup MSVC enviroment
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Setup Ninja
         uses: ./.github/actions/setup-ninja
         with:
-          host: linux
+          host: win
     
       # Install latest CMake and Ninja.
       - uses: lukka/get-cmake@latest
