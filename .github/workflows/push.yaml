@@ -4,12 +4,13 @@ on:
     branches: [master]
     paths-ignore:
       - '.github/workflows/**'
+      - '.github/actions/**'
   workflow_dispatch:
     
     
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-24.04
     steps:
 
       # Checkout the repository
@@ -18,6 +19,12 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+
+
+      - name: Setup Ninja
+        uses: ./.github/actions/setup-ninja
+        with:
+          host: linux
     
       # Install latest CMake and Ninja.
       - uses: lukka/get-cmake@latest
@@ -42,14 +49,14 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
 
-          configurePreset: 'vs-vcpkg'
+          configurePreset: 'ninja-msvc-release'
           # Additional arguments can be appended to the cmake command.
           # This is useful to reduce the number of CMake's Presets since you can reuse
           # an existing preset with different variables.
           #configurePresetAdditionalArgs: "['-DENABLE_YOUR_FEATURE=1']"
 
           # This is the name of the CMakePresets.json's configuration to build the project.
-          buildPreset: 'vs-vcpkg-release'
+          buildPreset: 'build-ninja-msvc'
           # Additional arguments can be appended when building, for example to specify the
           # configuration to build.
           # This is useful to reduce the number of CMake's Presets you need in CMakePresets.json.
@@ -62,6 +69,13 @@ jobs:
           # This is useful to reduce the number of CMake's Presets you need in CMakePresets.json.
           #testPresetAdditionalArgs: "['--config Release']"
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpp-artifact
+          path: |
+            build/ninja-msvc/out/*.dll
+            build/ninja-msvc/out/*.lib
     env:
        VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
     #  [OPTIONAL] Define the vcpkg's triplet you want to enforce, otherwise the default one

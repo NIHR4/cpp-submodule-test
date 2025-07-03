@@ -11,6 +11,21 @@
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_TARGET_TRIPLET": "x86-windows"
       }
+    },
+    {
+      "name": "ninja-msvc-release",
+      "displayName": "Ninja + MSVC",
+      "generator": "Ninja",
+      "description": "Use MSVC compiler with Ninja generator",
+      "binaryDir": "${sourceDir}/build/ninja-msvc",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/ninja-msvc/out",
+        "CMAKE_LIBRARY_OUTPUT_DIRECTORY": "${sourceDir}/build/ninja-msvc/out",
+        "CMAKE_ARCHIVE_OUTPUT_DIRECTORY": "${sourceDir}/build/ninja-msvc/out",
+        "VCPKG_TARGET_TRIPLET": "x86-windows"
+      }
     }
   ],
   "buildPresets": [
@@ -27,6 +42,12 @@
         "displayName": "Build (Debug)",
         "description": "Build with Visual Studio/vcpkg (Debug)",
         "configuration": "Debug"
+    },
+    {
+      "name": "build-ninja-msvc",
+      "configurePreset": "ninja-msvc-release",
+      "description": "Build using Ninja and MSVC",
+      "jobs": 8
     }
   ]
 }
