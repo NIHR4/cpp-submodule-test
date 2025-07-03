@@ -33,12 +33,13 @@ jobs:
       # Install latest CMake and Ninja.
       - uses: lukka/get-cmake@latest
 
-      # Cache and restore VCPKG (Workaround while)
-      - name: Cache vcpkg
-        uses: actions/cache@v4
+      # Restore Cache and restore VCPKG (Workaround while)
+      - name: Restore vcpkg cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/vcpkg_cache
           key: vcpkg-${{ matrix.triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg_overlay/**', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
+          restore-keys: vcpkg-${{ matrix.triplet }}-
 
       # Setup vcpkg: ensures vcpkg is downloaded and built.
       # Since vcpkg.json is being used later on to install the packages
@@ -72,6 +73,12 @@ jobs:
           # to test.
           # This is useful to reduce the number of CMake's Presets you need in CMakePresets.json.
           #testPresetAdditionalArgs: "['--config Release']"
+          
+      - name: Save vcpkg cache
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-${{ matrix.triplet }}-${{ hashFiles('vcpkg.json', 'vcpkg_overlay/**', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
